@@ -19,7 +19,8 @@ def generate_narration(text, output_path, voice_id=None, model_id=DEFAULT_MODEL_
     }
     payload = {"text": text, "model_id": model_id}
     resp = requests.post(url, headers=headers, json=payload, timeout=120)
-    resp.raise_for_status()
+    if not resp.ok:
+        raise RuntimeError(f"ElevenLabs TTS failed ({resp.status_code}): {resp.text}")
     with open(output_path, "wb") as f:
         f.write(resp.content)
     return probe_duration(output_path)
