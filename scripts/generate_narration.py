@@ -1,28 +1,24 @@
-"""Generate narration audio via the ElevenLabs REST API directly (no MCP —
-this runs on a GitHub Actions runner, which has plain internet access)."""
-import os
+"""Generate narration audio via edge-tts, which uses Microsoft Edge's own
+speech service for free — no account, no API key, no plan tier to run into.
+This replaces the earlier ElevenLabs-based version, which turned out to
+require a paid plan for any voice usable through its API."""
+import asyncio
 import subprocess
-import requests
 
-DEFAULT_MODEL_ID = "eleven_multilingual_v2"
+import edge_tts
+
+# Calm, deep, professional-sounding free Neural voice - closest free match to
+# the "calm, authoritative narrator" brief. Swapping voices is just a string
+# change here (no cloning/design process): try "en-US-GuyNeural" (warmer,
+# more conversational) as an alternative - run `edge-tts --list-voices` to
+# see the full catalog.
+DEFAULT_VOICE = "en-US-ChristopherNeural"
 
 
-def generate_narration(text, output_path, voice_id=None, model_id=DEFAULT_MODEL_ID):
-    # Falls back to the ELEVENLABS_VOICE_ID secret (Dean - Calm, Authoritative,
-    # mF5WrdU1593fy3PUKaSW) if no voice_id is passed explicitly.
-    voice_id = voice_id or os.environ["ELEVENLABS_VOICE_ID"]
-    url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
-    headers = {
-        "xi-api-key": os.environ["ELEVENLABS_API_KEY"],
-        "Content-Type": "application/json",
-        "Accept": "audio/mpeg",
-    }
-    payload = {"text": text, "model_id": model_id}
-    resp = requests.post(url, headers=headers, json=payload, timeout=120)
-    if not resp.ok:
-        raise RuntimeError(f"ElevenLabs TTS failed ({resp.status_code}): {resp.text}")
-    with open(output_path, "wb") as f:
-        f.write(resp.content)
+def generate_narration(text, output_path, voice_id=None):
+    voice = voice_id or DEFAULT_VOICE
+    communicate = edge_tts.Communicate(text, voice)
+    asyncio.run(communicate.save(output_path))
     return probe_duration(output_path)
 
 
