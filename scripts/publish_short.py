@@ -1,4 +1,4 @@
-"""Daily short-form pipeline: pull the next approved story, render a 9:16
+"""Short-form (3x daily) pipeline: pull the next approved story, render a 9:16
 video, post it to TikTok / YouTube Shorts / Instagram Reels via Buffer,
 and mark it Posted in Notion."""
 import datetime

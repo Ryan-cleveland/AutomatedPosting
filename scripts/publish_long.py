@@ -1,8 +1,8 @@
-"""Weekly long-form pipeline: pull the next approved story whose
+"""Daily long-form pipeline: pull the next approved story whose
 long_form_posted flag isn't set, render a 16:9 video from script_long, post
 it to YouTube as a regular long-form video via Buffer, and mark
 long_form_posted in Notion. Deliberately does not touch status /
-platforms_posted / posted_date -- those belong to the daily short-form run."""
+platforms_posted / posted_date -- those belong to the short-form run."""
 import datetime
 import os
 import sys
